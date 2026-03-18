@@ -140,11 +140,13 @@
       overflow: hidden;
     }
     .hero-bg {
-      position: absolute; inset: 0;
+      position: absolute;
+      inset: -15% 0; /* extra room for parallax travel */
+      will-change: transform;
     }
     .hero-bg img {
       width: 100%; height: 100%;
-      object-fit: cover; object-position: center 20%;
+      object-fit: cover; object-position: center 30%;
     }
     /* cinematic gradient */
     .hero-bg::after {
@@ -1212,6 +1214,22 @@
       });
     }, { threshold: 0.12 });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // ── Hero parallax ─────────────────────────────────────
+    const heroBg   = document.querySelector('.hero-bg');
+    const heroEl   = document.querySelector('.hero');
+    function heroParallax() {
+      const scrollY     = window.scrollY;
+      const heroBottom  = heroEl.offsetHeight;
+      if (scrollY > heroBottom) return;
+      // image drifts up at 35% of scroll speed — feels anchored
+      const drift = scrollY * 0.35;
+      // subtle zoom: scale from 1 → 1.08 as hero scrolls out
+      const scale = 1 + (scrollY / heroBottom) * 0.08;
+      heroBg.style.transform = `translateY(${drift}px) scale(${scale})`;
+    }
+    window.addEventListener('scroll', heroParallax, { passive: true });
+    heroParallax(); // initialise
 
     // ── Local nav active state ────────────────────────────
     const sections  = document.querySelectorAll('section[id]');
