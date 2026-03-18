@@ -132,14 +132,13 @@
     }
     .btn-ghost-dark:hover { border-color: var(--blue); transform: scale(1.02); }
 
-    /* ─── HERO — full viewport, image BG ────────────────── */
+    /* ─── HERO ───────────────────────────────────────────── */
+    /* 200vh gives scroll room for the panel reveal animation */
     .hero {
       position: relative;
-      height: 100svh; min-height: 640px;
-      display: flex; align-items: flex-end;
-      /* no overflow:hidden — would clip the fixed bg */
+      height: 200vh;
     }
-    /* Fixed image stays pinned while page content scrolls over it */
+    /* Fixed image — stays pinned to viewport throughout */
     .hero-bg {
       position: fixed;
       inset: 0;
@@ -148,93 +147,111 @@
     }
     .hero-bg img {
       width: 100%; height: 100%;
-      object-fit: cover; object-position: center 30%;
+      object-fit: cover; object-position: center 25%;
     }
-    /* Everything after the hero stacks above the fixed image */
-    .page-content {
-      position: relative;
-      z-index: 1;
-    }
-    /* cinematic gradient */
+    /* Subtle vignette — light enough to show the full image on load */
     .hero-bg::after {
       content: '';
       position: absolute; inset: 0;
       background: linear-gradient(
         to bottom,
-        rgba(0,0,0,0)    0%,
-        rgba(0,0,0,0.05) 40%,
-        rgba(0,0,0,0.45) 72%,
-        rgba(0,0,0,0.78) 100%
+        rgba(0,0,0,0.08) 0%,
+        rgba(0,0,0,0.05) 50%,
+        rgba(0,0,0,0.35) 100%
       );
     }
-    /* translucent frosted overlay panel at bottom */
-    .hero-overlay {
-      position: relative; z-index: 2; /* above fixed hero-bg */
-      width: 100%;
-      padding: 56px 80px 72px;
-      background: rgba(0,0,0,0.28);
-      backdrop-filter: blur(24px) saturate(160%);
-      -webkit-backdrop-filter: blur(24px) saturate(160%);
-      border-top: 1px solid rgba(255,255,255,0.12);
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 40px;
+    /* Sticky frame — holds the 100vh stage while hero scrolls */
+    .hero-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 2;
     }
-    .hero-copy {
-      flex: 1;
+    /* Centered intro text — "Introducing / Meirro." visible on load */
+    .hero-title-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      z-index: 3;
+      pointer-events: none;
+      will-change: opacity;
     }
     .hero-eyebrow {
-      font-size: 12px; font-weight: 600; letter-spacing: 2px;
+      font-size: 14px; font-weight: 500; letter-spacing: 3px;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.6);
-      margin-bottom: 10px;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 12px;
     }
     .hero-title {
-      font-size: clamp(56px, 9vw, 120px);
+      font-size: clamp(80px, 14vw, 180px);
       font-weight: 700;
       color: #fff;
-      letter-spacing: -3px;
+      letter-spacing: -5px;
       line-height: 1;
-      margin-bottom: 16px;
+    }
+    /* Scroll hint — bottom center, inside sticky frame */
+    .hero-scroll-hint {
+      position: absolute; bottom: 36px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      color: rgba(255,255,255,0.38);
+      font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+      animation: bounceDown 2s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .hero-scroll-hint svg { width: 18px; stroke: rgba(255,255,255,0.38); }
+    /* Frosted panel — starts fully off-screen below, slides up on scroll */
+    .hero-panel {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      transform: translateY(100%);
+      will-change: transform;
+      background: rgba(0,0,0,0.30);
+      backdrop-filter: blur(28px) saturate(160%);
+      -webkit-backdrop-filter: blur(28px) saturate(160%);
+      border-top: 1px solid rgba(255,255,255,0.14);
+      padding: 48px 80px 64px;
+      z-index: 4;
+    }
+    .hero-panel-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: flex-end;
+      justify-content: space-between; gap: 40px;
+      flex-wrap: wrap;
     }
     .hero-value-props {
       display: flex; gap: 28px; flex-wrap: wrap;
-      margin-bottom: 36px;
+      margin-bottom: 32px;
     }
     .hero-prop {
       display: flex; flex-direction: column;
     }
     .hero-prop-val {
       font-size: clamp(24px, 3.5vw, 40px);
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: -1.5px;
-      line-height: 1;
+      font-weight: 700; color: #fff;
+      letter-spacing: -1.5px; line-height: 1;
     }
     .hero-prop-label {
       font-size: 12px; font-weight: 400;
-      color: rgba(255,255,255,0.55);
-      margin-top: 4px;
-      letter-spacing: 0.2px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 5px; letter-spacing: 0.2px;
     }
     .hero-prop-divider {
       width: 1px; align-self: stretch;
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.18);
     }
     .hero-ctas {
-      display: flex; gap: 12px; flex-wrap: wrap;
-      align-items: center;
+      display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
     }
-    .hero-scroll-hint {
-      position: absolute; top: -52px; right: 80px;
-      z-index: 3;
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
-      color: rgba(255,255,255,0.4);
-      font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
-      animation: bounceDown 2s ease-in-out infinite;
+    /* Everything after the hero stacks above the fixed image */
+    .page-content {
+      position: relative;
+      z-index: 1;
     }
-    .hero-scroll-hint svg { width: 20px; stroke: rgba(255,255,255,0.4); }
     @keyframes bounceDown {
       0%, 100% { transform: translateY(0); }
       50%       { transform: translateY(6px); }
@@ -692,7 +709,7 @@
 
     /* ─── RESPONSIVE ─────────────────────────────────────── */
     @media (max-width: 900px) {
-      .hero-overlay { padding: 40px 32px 56px; flex-direction: column; align-items: flex-start; }
+      .hero-panel { padding: 36px 28px 52px; }
       .stat-row-inner { grid-template-columns: repeat(2, 1fr); }
       .stat-item:nth-child(2) { border-right: none; }
       .stat-item { border-bottom: 1px solid var(--dk-border); }
@@ -741,6 +758,8 @@
 
   <!-- ─── HERO ─────────────────────────────────────────── -->
   <section class="hero" id="overview">
+
+    <!-- Fixed background image -->
     <div class="hero-bg">
       <img
         src="https://www.apple.com/v/studio-display-xdr/a/images/overview/welcome/hero_endframe__e9f8zohdmimy_large.jpg"
@@ -749,38 +768,52 @@
       />
     </div>
 
-    <div class="hero-overlay">
-      <div class="hero-copy">
+    <!-- Sticky viewport frame — holds the stage -->
+    <div class="hero-sticky">
+
+      <!-- Centered intro — visible on load, fades as panel rises -->
+      <div class="hero-title-wrap" aria-hidden="true">
         <p class="hero-eyebrow">Introducing</p>
         <h1 class="hero-title">Meirro.</h1>
-        <div class="hero-value-props">
-          <div class="hero-prop">
-            <span class="hero-prop-val">6K</span>
-            <span class="hero-prop-label">6016 × 3384 resolution</span>
-          </div>
-          <div class="hero-prop-divider"></div>
-          <div class="hero-prop">
-            <span class="hero-prop-val">32″</span>
-            <span class="hero-prop-label">Retina IPS panel</span>
-          </div>
-          <div class="hero-prop-divider"></div>
-          <div class="hero-prop">
-            <span class="hero-prop-val">Premium</span>
-            <span class="hero-prop-label">Built without compromise</span>
-          </div>
-        </div>
-        <div class="hero-ctas">
-          <a href="#buy" class="btn-primary">Order now</a>
-          <a href="#display" class="btn-ghost">Learn more</a>
-        </div>
       </div>
+
+      <!-- Scroll hint -->
       <div class="hero-scroll-hint" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="6 9 12 15 18 9"/>
         </svg>
         <span>Scroll</span>
       </div>
-    </div>
+
+      <!-- Frosted panel — slides up on scroll -->
+      <div class="hero-panel">
+        <div class="hero-panel-inner">
+          <div>
+            <div class="hero-value-props">
+              <div class="hero-prop">
+                <span class="hero-prop-val">6K</span>
+                <span class="hero-prop-label">6016 × 3384 resolution</span>
+              </div>
+              <div class="hero-prop-divider"></div>
+              <div class="hero-prop">
+                <span class="hero-prop-val">32″</span>
+                <span class="hero-prop-label">Retina IPS panel</span>
+              </div>
+              <div class="hero-prop-divider"></div>
+              <div class="hero-prop">
+                <span class="hero-prop-val">Premium</span>
+                <span class="hero-prop-label">Built without compromise</span>
+              </div>
+            </div>
+            <div class="hero-ctas">
+              <a href="#buy" class="btn-primary">Order now</a>
+              <a href="#display" class="btn-ghost">Learn more</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.hero-sticky -->
   </section>
 
   <!-- All sections below scroll over the fixed hero image -->
@@ -1227,21 +1260,38 @@
     }, { threshold: 0.12 });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    // ── Hero parallax ─────────────────────────────────────
-    // Image is position:fixed so it's already anchored.
-    // We add a subtle zoom as you scroll through the hero — like Vision Pro.
-    const heroBg  = document.querySelector('.hero-bg');
-    const heroEl  = document.querySelector('.hero');
-    function heroParallax() {
+    // ── Hero scroll animation ─────────────────────────────
+    const heroBg       = document.querySelector('.hero-bg');
+    const heroEl       = document.querySelector('.hero');
+    const heroPanel    = document.querySelector('.hero-panel');
+    const heroTitleWrap= document.querySelector('.hero-title-wrap');
+    const heroScrollHint = document.querySelector('.hero-scroll-hint');
+
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+    function updateHero() {
       const scrollY    = window.scrollY;
-      const heroHeight = heroEl.offsetHeight;
-      if (scrollY > heroHeight) return;
-      const progress = scrollY / heroHeight;          // 0 → 1
-      const scale    = 1 + progress * 0.07;           // 1.0 → 1.07
+      // scroll room = hero height (200vh) minus one viewport
+      const scrollRoom = heroEl.offsetHeight - window.innerHeight;
+      const progress   = Math.max(0, Math.min(1, scrollY / scrollRoom));
+
+      // Panel slides up: starts at progress 0.1, fully revealed at 0.55
+      const panelRaw      = Math.max(0, Math.min(1, (progress - 0.1) / 0.45));
+      const panelProgress = easeOutCubic(panelRaw);
+      heroPanel.style.transform = `translateY(${(1 - panelProgress) * 100}%)`;
+
+      // Title + scroll hint fade out as panel rises
+      const titleOpacity = Math.max(0, 1 - panelRaw * 1.8);
+      heroTitleWrap.style.opacity  = titleOpacity;
+      heroScrollHint.style.opacity = titleOpacity;
+
+      // Subtle zoom on the fixed image
+      const scale = 1 + progress * 0.06;
       heroBg.style.transform = `scale(${scale})`;
     }
-    window.addEventListener('scroll', heroParallax, { passive: true });
-    heroParallax();
+
+    window.addEventListener('scroll', updateHero, { passive: true });
+    updateHero();
 
     // ── Local nav active state ────────────────────────────
     const sections  = document.querySelectorAll('section[id]');
