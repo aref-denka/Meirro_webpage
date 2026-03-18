@@ -137,16 +137,23 @@
       position: relative;
       height: 100svh; min-height: 640px;
       display: flex; align-items: flex-end;
-      overflow: hidden;
+      /* no overflow:hidden — would clip the fixed bg */
     }
+    /* Fixed image stays pinned while page content scrolls over it */
     .hero-bg {
-      position: absolute;
-      inset: -15% 0; /* extra room for parallax travel */
+      position: fixed;
+      inset: 0;
+      z-index: 0;
       will-change: transform;
     }
     .hero-bg img {
       width: 100%; height: 100%;
       object-fit: cover; object-position: center 30%;
+    }
+    /* Everything after the hero stacks above the fixed image */
+    .page-content {
+      position: relative;
+      z-index: 1;
     }
     /* cinematic gradient */
     .hero-bg::after {
@@ -162,7 +169,7 @@
     }
     /* translucent frosted overlay panel at bottom */
     .hero-overlay {
-      position: relative; z-index: 2;
+      position: relative; z-index: 2; /* above fixed hero-bg */
       width: 100%;
       padding: 56px 80px 72px;
       background: rgba(0,0,0,0.28);
@@ -776,6 +783,9 @@
     </div>
   </section>
 
+  <!-- All sections below scroll over the fixed hero image -->
+  <div class="page-content">
+
   <!-- ═══════════════════════════════════════════════════
        LIGHT SECTIONS — Product & Mission
        ═══════════════════════════════════════════════════ -->
@@ -1188,6 +1198,8 @@
     </div>
   </footer>
 
+  </div><!-- /.page-content -->
+
   <script>
     // ── Carousel ─────────────────────────────────────────
     function initCarousel(tabsId, imgId) {
@@ -1216,20 +1228,20 @@
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
     // ── Hero parallax ─────────────────────────────────────
-    const heroBg   = document.querySelector('.hero-bg');
-    const heroEl   = document.querySelector('.hero');
+    // Image is position:fixed so it's already anchored.
+    // We add a subtle zoom as you scroll through the hero — like Vision Pro.
+    const heroBg  = document.querySelector('.hero-bg');
+    const heroEl  = document.querySelector('.hero');
     function heroParallax() {
-      const scrollY     = window.scrollY;
-      const heroBottom  = heroEl.offsetHeight;
-      if (scrollY > heroBottom) return;
-      // image drifts up at 35% of scroll speed — feels anchored
-      const drift = scrollY * 0.35;
-      // subtle zoom: scale from 1 → 1.08 as hero scrolls out
-      const scale = 1 + (scrollY / heroBottom) * 0.08;
-      heroBg.style.transform = `translateY(${drift}px) scale(${scale})`;
+      const scrollY    = window.scrollY;
+      const heroHeight = heroEl.offsetHeight;
+      if (scrollY > heroHeight) return;
+      const progress = scrollY / heroHeight;          // 0 → 1
+      const scale    = 1 + progress * 0.07;           // 1.0 → 1.07
+      heroBg.style.transform = `scale(${scale})`;
     }
     window.addEventListener('scroll', heroParallax, { passive: true });
-    heroParallax(); // initialise
+    heroParallax();
 
     // ── Local nav active state ────────────────────────────
     const sections  = document.querySelectorAll('section[id]');
